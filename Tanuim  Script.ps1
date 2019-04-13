@@ -12,14 +12,22 @@ if ($env:PROCESSOR_ARCHITEW6432 -eq "AMD64") {
   exit $lastexitcode
 
 }
-# Write Script Below
 
-#Admin Variables
+
+<#PS Script to check local administrator policy compliance.
+Script checks if the local admin password has been updated or not, and whether there are any users or groups in the local administrators group that shouldn't be.
+#>
+
+
+#who your default local admin user is
 $localadmin="danny"
+#Max number of days old your local admin password can be to be in compliance
 $maxdays=0
-$standardadmins='DHLAB\Domain Admins','.\Administrator','.\danny'
+#permitted users and groups in the local administrators group
+$standardadmins='DHLAB\Domain Admins',"$Env:Computername\Administrator","$Env:Computername\danny"
+
+
 $localadminmembers=Get-Localgroupmember administrators | select -expandproperty Name 
-$localadminmembers=$localadminmembers -replace "$Env:Computername", '.'
 $diffmem=compare-object $localadminmembers $standardadmins
 $today=get-date -Format g
 $resetdate=$resetdate=get-localuser $localadmin | select -expandproperty passwordlastset
